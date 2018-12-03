@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Tetris</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <script>
+            var juego = {
+                espai: new Array(),
+                puntuacio: 0,
+                maxPuntuacio: 0,
+                piezaActual: "",
+                piezaSiguiente: "",
+                intervalo: 0,
+                cont: {
+                    "I": 0,
+                    "T": 0,
+                    "L": 0,
+                    "J": 0,
+                    "O": 0,
+                    "S": 0,
+                    "Z": 0
+                },
+                generaMapa: function () {
+                    for (var fila = 0; fila < 25; fila++) {
+                        this.espai.push([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+                    }
+                },
+                inicialitzaJoc: function () {
+
+                },
+                piezaSig: function () {
+
+                },
+                iteraccioTeclat: function () {
+
+                },
+                moure: function () {
+
+                }
+            };
+
+            juego.generaMapa();
+            for (var i = 0; i < juego.espai.length; i++) {
+                document.write(juego.espai[i]+"<br>");
+                
+            }
+        </script>
+    </body>
+</html>
