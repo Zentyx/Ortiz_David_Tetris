@@ -18,7 +18,7 @@ and open the template in the editor.
                 maxPuntuacio: 0,
                 piezaActual: "",
                 piezaSiguiente: "",
-                intervalo: 0,
+                intervalo: 1,
                 cont: {
                     "I": 0,
                     "T": 0,
@@ -30,14 +30,14 @@ and open the template in the editor.
                 },
                 generaMapa: function () {
                     for (var fila = 0; fila < 25; fila++) {
-                        this.espai.push([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+                        this.espai.push([1, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
                     }
                 },
                 inicialitzaJoc: function () {
 
                 },
                 piezaSig: function () {
-
+                    
                 },
                 iteraccioTeclat: function () {
 
@@ -46,12 +46,52 @@ and open the template in the editor.
 
                 }
             };
-
-            juego.generaMapa();
-            for (var i = 0; i < juego.espai.length; i++) {
-                document.write(juego.espai[i]+"<br>");
+            
+            var Pieza= function(forma,color,posicio){
+                this.forma= forma;
+                this.color=color;
+                this.posicio=posicio;
+            };
+            Pieza.prototype.rotaHorari= function(){
                 
+            };
+            Pieza.prototype.rotaAntiHorari= function(){
+                
+            };
+            Pieza.prototype.baixa= function(){
+                
+            };
+            Pieza.prototype.esquerra= function(){
+                
+            };
+            Pieza.prototype.dreta= function(){
+                
+            };
+            Pieza.prototype.forma= function(forma){
+                
+                return forma;
+            };
+            
+            
+            function pintarJuego(){
+                document.write("Puntuació: "+juego.puntuacio+"<br>\n\
+                Puntuació Màxima: "+juego.maxPuntuacio+"<br>\n\
+                Nivell: "+juego.intervalo+"<br><br>");
+                 for (var fila = 0; fila < juego.espai.length; fila++) {
+                for (var columna = 0; columna < juego.espai[fila].length; columna++) {
+                    pintarCasilla(fila,columna);
+                }
+                document.write("<br>");
             }
+            };
+            
+            function pintarCasilla(fila,columna){
+                document.write(juego.espai[fila][columna]);
+            }
+            juego.generaMapa();
+            pintarJuego();
+            console.log(juego.espai);
+            
         </script>
     </body>
 </html>
