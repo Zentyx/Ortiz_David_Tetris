@@ -11,13 +11,28 @@ and open the template in the editor.
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body>
-        <script>
+        <p id="puntuacio"></p>
+        <p id="puntuacioMaxima"></p>
+        <p id="nivell"></p>
+        <img src="amarillo.png"    id="amarillo"    style="display: none;">
+        <img src="azul.jpg"        id="azul"    style="display: none;">
+        <img src="cian.jpg"        id="cian"    style="display: none;">
+        <img src="lila.jpg"        id="lila"    style="display: none;">
+        <img src="naranja.png"     id="naranja"    style="display: none;">
+        <img src="rojo.jpg"        id="rojo"    style="display: none;">
+        <img src="verde.jpg"       id="verde"    style="display: none;">
+        <img src="cuadradoGris.png"       id="gris"    style="display: none;">
+
+        <canvas id="mapa" width="209" height="500" style="border: solid black 1px"> </canvas>
+
+        <script> //21 3
             var juego = {
                 espai: new Array(),
                 puntuacio: 0,
                 maxPuntuacio: 0,
-                piezaActual: "",
-                piezaSiguiente: "",
+                piezaActual: {},
+                nivell: 1,
+                piezaSiguiente: {},
                 intervalo: 1,
                 cont: {
                     "I": 0,
@@ -30,68 +45,126 @@ and open the template in the editor.
                 },
                 generaMapa: function () {
                     for (var fila = 0; fila < 25; fila++) {
-                        this.espai.push([1, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+                        this.espai.push([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
                     }
                 },
                 inicialitzaJoc: function () {
 
                 },
                 piezaSig: function () {
-                    
+
                 },
                 iteraccioTeclat: function () {
 
                 },
                 moure: function () {
 
+                },
+                mostrarInfo: function(){
+                    document.getElementById("puntuacio").innerHTML = "Puntuacio "+ this.puntuacio;
+                    document.getElementById("puntuacioMaxima").innerHTML = "Nivell: "+ this.maxPuntuacio;
+                    document.getElementById("nivell").innerHTML = "Nivell: "+ this.nivell;
+                }
+            };
+
+            var Pieza = function (forma, color, posicioX, posicioY) {
+                this.forma = forma;
+                this.color = color;
+                this.posicioX = posicioX;
+                this.posicioY = posicioY;
+            };
+            Pieza.prototype.rotaHorari = function () {
+                var formaNova = new Array();
+                for (var i = 0; i < this.forma.length; i++) {
+                    formaNova[i] = new Array();
+                    for (var j = 0; j < this.forma[i].length; j++) {
+                        formaNova[i][j] = this.forma[this.forma[i].length - 1 - j][i];
+                    }
+                }
+                this.forma = formaNova;
+            };
+            Pieza.prototype.rotaAntiHorari = function () {
+
+            };
+            Pieza.prototype.baixa = function () {
+
+            };
+            Pieza.prototype.esquerra = function () {
+                if ((posicioY + 1) < 14) {
+                    posicioY++;
+                    return true;
+                } else {
+                    return false;
+                }
+            };
+            Pieza.prototype.dreta = function () {
+                if ((posicioX - 1) > 0) {
+                    posicioX--;
+                    return true;
+                } else {
+                    return false;
+                }
+            };
+
+
+
+            function pintarJuego() {
+                //                document.write("Puntuació: " + juego.puntuacio + "<br>\n\
+                //                Puntuació Màxima: " + juego.maxPuntuacio + "<br>\n\
+                //                Nivell: " + juego.intervalo + "<br><br>");
+                var canvas = document.getElementById("mapa");
+                var ctx = canvas.getContext("2d");
+                var img;
+                for (var fila = 0; fila < juego.espai.length; fila++) {
+                    for (var columna = 0; columna < juego.espai[fila].length; columna++) {
+                        if (juego.espai[fila][columna] == 0) {
+                            img = document.getElementById("gris");
+                        }
+
+                        ctx.drawImage(img, columna * 21, fila * 21, 20, 20);
+                    }
+
                 }
             };
             
-            var Pieza= function(forma,color,posicio){
-                this.forma= forma;
-                this.color=color;
-                this.posicio=posicio;
-            };
-            Pieza.prototype.rotaHorari= function(){
+            function mostrarDatos(){
                 
-            };
-            Pieza.prototype.rotaAntiHorari= function(){
-                
-            };
-            Pieza.prototype.baixa= function(){
-                
-            };
-            Pieza.prototype.esquerra= function(){
-                
-            };
-            Pieza.prototype.dreta= function(){
-                
-            };
-            Pieza.prototype.forma= function(forma){
-                
-                return forma;
-            };
-            
-            
-            function pintarJuego(){
-                document.write("Puntuació: "+juego.puntuacio+"<br>\n\
-                Puntuació Màxima: "+juego.maxPuntuacio+"<br>\n\
-                Nivell: "+juego.intervalo+"<br><br>");
-                 for (var fila = 0; fila < juego.espai.length; fila++) {
-                for (var columna = 0; columna < juego.espai[fila].length; columna++) {
-                    pintarCasilla(fila,columna);
-                }
-                document.write("<br>");
             }
-            };
-            
-            function pintarCasilla(fila,columna){
-                document.write(juego.espai[fila][columna]);
+
+            function GeneraPecaAleatoria()
+            {
+                var peces = [
+                    [[[0, 0, 0, 0], [0, 1, 1, 0], [0, 1, 1, 0], [0, 0, 0, 0]], "groc"],
+                    [[[0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 0, 0]], "cian"],
+                    [[[0, 0, 0, 0], [0, 1, 1, 0], [1, 1, 0, 0], [0, 0, 0, 0]], "verd"],
+                    [[[0, 0, 0, 0], [0, 1, 1, 0], [0, 0, 1, 1], [0, 0, 0, 0]], "roig"],
+                    [[[0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 1, 0], [0, 0, 0, 0]], "blau"],
+                    [[[0, 1, 1, 0], [0, 1, 0, 0], [0, 1, 0, 0], [0, 0, 0, 0]], "taronga"],
+                    [[[0, 0, 0, 0], [1, 1, 1, 0], [0, 1, 0, 0], [0, 0, 0, 0]], "morat"]]
+                var numeroAleatori = Math.round(Math.random() * 6);
+                return peces[numeroAleatori];
             }
-            juego.generaMapa();
-            pintarJuego();
-            console.log(juego.espai);
-            
+
+            console.log(GeneraPecaAleatoria());
+            console.log(GeneraPecaAleatoria());
+            console.log(GeneraPecaAleatoria());
+            console.log(GeneraPecaAleatoria());
+            console.log(GeneraPecaAleatoria());
+            console.log(GeneraPecaAleatoria());
+
+            window.onload = function () {
+                juego.generaMapa();
+                pintarJuego();
+                juego.mostrarInfo();
+                
+//                var pAleatoria = GeneraPecaAleatoria();
+//                juego.piezaSiguiente= new Pieza(pAleatoria[0],pAleatoria[1],21,3);
+                var pAleatoria = GeneraPecaAleatoria();
+                juego.piezaActual= new Pieza(pAleatoria[0],pAleatoria[1],21,3);
+                
+                console.log(juego.piezaActual.forma);
+                
+            };
         </script>
     </body>
 </html>
