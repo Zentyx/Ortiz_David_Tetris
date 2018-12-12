@@ -49,10 +49,16 @@ and open the template in the editor.
                     }
                 },
                 inicialitzaJoc: function () {
+                    this.generaMapa();
 
+                    this.mostrarInfo();
+                    this.piezaSig();
+                    console.log(this.piezaSig());
                 },
                 piezaSig: function () {
-
+                    var pAleatoria = GeneraPecaAleatoria();
+                    this.piezaSiguiente = new Pieza(pAleatoria[0], pAleatoria[1], 21, 3);
+                    return this.piezaSiguiente;
                 },
                 iteraccioTeclat: function () {
 
@@ -60,10 +66,10 @@ and open the template in the editor.
                 moure: function () {
 
                 },
-                mostrarInfo: function(){
-                    document.getElementById("puntuacio").innerHTML = "Puntuacio "+ this.puntuacio;
-                    document.getElementById("puntuacioMaxima").innerHTML = "Nivell: "+ this.maxPuntuacio;
-                    document.getElementById("nivell").innerHTML = "Nivell: "+ this.nivell;
+                mostrarInfo: function () {
+                    document.getElementById("puntuacio").innerHTML = "Puntuacio " + this.puntuacio;
+                    document.getElementById("puntuacioMaxima").innerHTML = "Nivell: " + this.maxPuntuacio;
+                    document.getElementById("nivell").innerHTML = "Nivell: " + this.nivell;
                 }
             };
 
@@ -84,27 +90,47 @@ and open the template in the editor.
                 this.forma = formaNova;
             };
             Pieza.prototype.rotaAntiHorari = function () {
-
+                var formaNova;
+                for (var i = 0; i < 3; i++) {
+                    formaNova = this.rotaHorari();
+                }
+                return formaNova;
             };
             Pieza.prototype.baixa = function () {
-
+                if ((this.posicioY + 1) < 14) {
+                    this.posicioY++;
+                    return true;
+                } else {
+                    return false;
+                }
             };
             Pieza.prototype.esquerra = function () {
-                if ((posicioY + 1) < 14) {
-                    posicioY++;
+                if ((this.posicioX + 1) < 14) {
+                    this.posicioX++;
                     return true;
                 } else {
                     return false;
                 }
             };
             Pieza.prototype.dreta = function () {
-                if ((posicioX - 1) > 0) {
-                    posicioX--;
+                if ((this.posicioX - 1) > 0) {
+                    this.posicioX--;
                     return true;
                 } else {
                     return false;
                 }
             };
+            Pieza.prototype.asignarLetras = function () {
+                
+                for (var i = 0; i < this.forma.length; i++) {
+                    for (var j = 0; j < this.forma[i].length; j++) {
+                        if (this.forma[i][j]===1) {
+                            //TODO
+                        }
+                    }
+                }
+            };
+
 
 
 
@@ -117,19 +143,43 @@ and open the template in the editor.
                 var img;
                 for (var fila = 0; fila < juego.espai.length; fila++) {
                     for (var columna = 0; columna < juego.espai[fila].length; columna++) {
-                        if (juego.espai[fila][columna] == 0) {
-                            img = document.getElementById("gris");
+                        switch (juego.espai[fila][columna]) {
+                            case 0:
+                                img = document.getElementById("gris");
+                                break;
+                            case "I":
+                                img = document.getElementById("cian");
+                                break;
+                            case "O":
+                                img = document.getElementById("azul");
+                                break;
+                            case "T":
+                                img = document.getElementById("lila");
+                                break;
+                            case "L":
+                                img = document.getElementById("amarillo");
+                                break;
+                            case "J":
+                                img = document.getElementById("naranja");
+                                break;
+                            case "S":
+                                img = document.getElementById("verde");
+                                break;
+                            case "Z":
+                                img = document.getElementById("rojo");
+                                break;
+
+                            default :
+                                break;
                         }
+
 
                         ctx.drawImage(img, columna * 21, fila * 21, 20, 20);
                     }
 
                 }
-            };
-            
-            function mostrarDatos(){
-                
             }
+            ;
 
             function GeneraPecaAleatoria()
             {
@@ -145,25 +195,11 @@ and open the template in the editor.
                 return peces[numeroAleatori];
             }
 
-            console.log(GeneraPecaAleatoria());
-            console.log(GeneraPecaAleatoria());
-            console.log(GeneraPecaAleatoria());
-            console.log(GeneraPecaAleatoria());
-            console.log(GeneraPecaAleatoria());
-            console.log(GeneraPecaAleatoria());
-
             window.onload = function () {
-                juego.generaMapa();
-                pintarJuego();
-                juego.mostrarInfo();
-                
-//                var pAleatoria = GeneraPecaAleatoria();
-//                juego.piezaSiguiente= new Pieza(pAleatoria[0],pAleatoria[1],21,3);
-                var pAleatoria = GeneraPecaAleatoria();
-                juego.piezaActual= new Pieza(pAleatoria[0],pAleatoria[1],21,3);
-                
-                console.log(juego.piezaActual.forma);
-                
+
+                juego.inicialitzaJoc();
+                setInterval(pintarJuego, juego.nivell);
+
             };
         </script>
     </body>
