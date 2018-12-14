@@ -23,7 +23,7 @@ and open the template in the editor.
         <img src="verde.jpg"       id="verde"    style="display: none;">
         <img src="cuadradoGris.png"       id="gris"    style="display: none;">
 
-        <canvas id="mapa" width="209" height="500" style="border: solid black 1px"> </canvas>
+        <canvas id="mapa" width="200" height="500" style="border: solid black 1px"> </canvas>
 
         <script> //21 3
             var juego = {
@@ -50,14 +50,15 @@ and open the template in the editor.
                 },
                 inicialitzaJoc: function () {
                     this.generaMapa();
-
                     this.mostrarInfo();
-                    this.piezaSig();
-                    console.log(this.piezaSig());
+                    this.piezaSiguiente = this.piezaSig();
+                    this.piezaActual = this.piezaSiguiente;
+                    pintarJuego();
+
                 },
                 piezaSig: function () {
                     var pAleatoria = GeneraPecaAleatoria();
-                    this.piezaSiguiente = new Pieza(pAleatoria[0], pAleatoria[1], 21, 3);
+                    this.piezaSiguiente = new Pieza(pAleatoria[0], pAleatoria[1], 0, 2);
                     return this.piezaSiguiente;
                 },
                 iteraccioTeclat: function () {
@@ -121,11 +122,36 @@ and open the template in the editor.
                 }
             };
             Pieza.prototype.asignarLetras = function () {
-                
+                var forma = this.forma[0];
+                var posicioY = this.posicioY;
+                var posicioX = this.posicioX;
+
                 for (var i = 0; i < this.forma.length; i++) {
                     for (var j = 0; j < this.forma[i].length; j++) {
-                        if (this.forma[i][j]===1) {
-                            //TODO
+                        if (this.forma[i][j] === 1) {
+                            switch (this.color) {
+                                case 'groc':
+                                    juego.espai[posicioY + i][posicioX + j] = 'O';
+                                    break;
+                                case 'cian':
+                                    juego.espai[posicioY + i][posicioX + j] = 'I';
+                                    break;
+                                case 'verd':
+                                    juego.espai[posicioY + i][posicioX + j] = 'S';
+                                    break;
+                                case 'roig':
+                                    juego.espai[posicioY + i][posicioX + j] = 'Z';
+                                    break;
+                                case 'blau':
+                                    juego.espai[posicioY + i][posicioX + j] = 'L';
+                                    break;
+                                case 'taronja':
+                                    juego.espai[posicioY + i][posicioX + j] = 'J';
+                                    break;
+                                case 'morat':
+                                    juego.espai[posicioY + i][posicioX + j] = 'T';
+                                    break;
+                            }
                         }
                     }
                 }
@@ -135,15 +161,31 @@ and open the template in the editor.
 
 
             function pintarJuego() {
-                //                document.write("Puntuació: " + juego.puntuacio + "<br>\n\
-                //                Puntuació Màxima: " + juego.maxPuntuacio + "<br>\n\
-                //                Nivell: " + juego.intervalo + "<br><br>");
                 var canvas = document.getElementById("mapa");
                 var ctx = canvas.getContext("2d");
                 var img;
                 for (var fila = 0; fila < juego.espai.length; fila++) {
                     for (var columna = 0; columna < juego.espai[fila].length; columna++) {
-                        switch (juego.espai[fila][columna]) {
+                       img=llegeixEspai(fila,columna); //leemos cada casilla del tablero
+                        ctx.drawImage(img, columna * 20, fila * 20, 20, 20);
+                    }
+                }
+                img = document.getElementById("naranja");
+                for (var i = 0; i < juego.piezaActual.forma.length; i++) {
+                        for (var j = 0; j < juego.piezaActual.forma[i].length; j++) {
+                            if (juego.piezaActual.forma[i][j] == 1) {
+                                //console.log(juego.piezaActual.posicioX+"-"+juego.piezaActual.posicioY);
+                                console.log((juego.piezaActual.posicioX+i)+"-"+(juego.piezaActual.posicioY+j));
+                                ctx.drawImage(img, (juego.piezaActual.posicioY+j)*20, (juego.piezaActual.posicioX+i)*20, 20, 20);
+                            }
+                        }
+                    }
+            }
+            ;
+            
+            function llegeixEspai(fila,columna){
+                var img;
+                switch (juego.espai[fila][columna]) {
                             case 0:
                                 img = document.getElementById("gris");
                                 break;
@@ -151,13 +193,13 @@ and open the template in the editor.
                                 img = document.getElementById("cian");
                                 break;
                             case "O":
-                                img = document.getElementById("azul");
+                                img = document.getElementById("amarillo");
                                 break;
                             case "T":
                                 img = document.getElementById("lila");
                                 break;
                             case "L":
-                                img = document.getElementById("amarillo");
+                                img = document.getElementById("azul");
                                 break;
                             case "J":
                                 img = document.getElementById("naranja");
@@ -168,18 +210,12 @@ and open the template in the editor.
                             case "Z":
                                 img = document.getElementById("rojo");
                                 break;
-
                             default :
                                 break;
                         }
-
-
-                        ctx.drawImage(img, columna * 21, fila * 21, 20, 20);
-                    }
-
-                }
+                        
+                        return img;
             }
-            ;
 
             function GeneraPecaAleatoria()
             {
@@ -189,7 +225,7 @@ and open the template in the editor.
                     [[[0, 0, 0, 0], [0, 1, 1, 0], [1, 1, 0, 0], [0, 0, 0, 0]], "verd"],
                     [[[0, 0, 0, 0], [0, 1, 1, 0], [0, 0, 1, 1], [0, 0, 0, 0]], "roig"],
                     [[[0, 1, 0, 0], [0, 1, 0, 0], [0, 1, 1, 0], [0, 0, 0, 0]], "blau"],
-                    [[[0, 1, 1, 0], [0, 1, 0, 0], [0, 1, 0, 0], [0, 0, 0, 0]], "taronga"],
+                    [[[0, 1, 1, 0], [0, 1, 0, 0], [0, 1, 0, 0], [0, 0, 0, 0]], "taronja"],
                     [[[0, 0, 0, 0], [1, 1, 1, 0], [0, 1, 0, 0], [0, 0, 0, 0]], "morat"]]
                 var numeroAleatori = Math.round(Math.random() * 6);
                 return peces[numeroAleatori];
@@ -198,7 +234,8 @@ and open the template in the editor.
             window.onload = function () {
 
                 juego.inicialitzaJoc();
-                setInterval(pintarJuego, juego.nivell);
+                
+                //setInterval(pintarJuego, juego.nivell);
 
             };
         </script>
