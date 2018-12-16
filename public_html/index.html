@@ -26,6 +26,7 @@ and open the template in the editor.
         <canvas id="mapa" width="200" height="500" style="border: solid black 1px"> </canvas>
 
         <script> //21 3
+            var movimientoAutomatico;
             var juego = {
                 espai: new Array(),
                 puntuacio: 0,
@@ -33,7 +34,7 @@ and open the template in the editor.
                 piezaActual: {},
                 nivell: 1,
                 piezaSiguiente: {},
-                intervalo: 1,
+                intervalo: 500,
                 cont: {
                     "I": 0,
                     "T": 0,
@@ -51,9 +52,10 @@ and open the template in the editor.
                 inicialitzaJoc: function () {
                     this.generaMapa();
                     this.mostrarInfo();
+                    this.piezaActual = this.piezaSig();
                     this.piezaSiguiente = this.piezaSig();
-                    this.piezaActual = this.piezaSiguiente;
                     pintarJuego();
+                    movimientoAutomatico = setInterval(this.moure, this.intervalo);
 
                 },
                 piezaSig: function () {
@@ -65,6 +67,24 @@ and open the template in the editor.
 
                 },
                 moure: function () {
+                    
+                    for (var i = 0; i < juego.piezaActual.forma.length; i++) {
+                        for (var j = 0; j < juego.piezaActual.forma[i].length; j++) {
+                            if (juego.piezaActual.forma[i][j] == 1) {
+                                //console.log(juego.piezaActual.posicioX+"-"+juego.piezaActual.posicioY);
+                                console.log((juego.piezaActual.posicioX + j) + "-" + (juego.piezaActual.posicioY + i));
+                                if (juego.piezaActual.posicioY + i >= 23) { //preguntar por poner juego en vez de this
+                                    clearInterval(movimientoAutomatico);
+//                                    juego.piezaActual=juego.piezaSiguiente;
+//                                    juego.piezaSiguiente=juego.piezaSig();
+//                                    pintarJuego();
+                                }
+                            }
+                        }
+                    }
+                    juego.piezaActual.posicioY++;
+                                    pintarJuego();
+
 
                 },
                 mostrarInfo: function () {
@@ -77,8 +97,8 @@ and open the template in the editor.
             var Pieza = function (forma, color, posicioX, posicioY) {
                 this.forma = forma;
                 this.color = color;
-                this.posicioX = posicioX;
-                this.posicioY = posicioY;
+                this.posicioY = posicioX;
+                this.posicioX = posicioY;
             };
             Pieza.prototype.rotaHorari = function () {
                 var formaNova = new Array();
@@ -98,14 +118,6 @@ and open the template in the editor.
                 return formaNova;
             };
             Pieza.prototype.baixa = function () {
-                if ((this.posicioY + 1) < 14) {
-                    this.posicioY++;
-                    return true;
-                } else {
-                    return false;
-                }
-            };
-            Pieza.prototype.esquerra = function () {
                 if ((this.posicioX + 1) < 14) {
                     this.posicioX++;
                     return true;
@@ -113,9 +125,17 @@ and open the template in the editor.
                     return false;
                 }
             };
+            Pieza.prototype.esquerra = function () {
+                if ((this.posicioY + 1) < 14) {
+                    this.posicioY++;
+                    return true;
+                } else {
+                    return false;
+                }
+            };
             Pieza.prototype.dreta = function () {
-                if ((this.posicioX - 1) > 0) {
-                    this.posicioX--;
+                if ((this.posicioY - 1) > 0) {
+                    this.posicioY--;
                     return true;
                 } else {
                     return false;
@@ -123,33 +143,33 @@ and open the template in the editor.
             };
             Pieza.prototype.asignarLetras = function () {
                 var forma = this.forma[0];
+                var posicioX = this.posicioY;
                 var posicioY = this.posicioY;
-                var posicioX = this.posicioX;
 
                 for (var i = 0; i < this.forma.length; i++) {
                     for (var j = 0; j < this.forma[i].length; j++) {
                         if (this.forma[i][j] === 1) {
                             switch (this.color) {
                                 case 'groc':
-                                    juego.espai[posicioY + i][posicioX + j] = 'O';
+                                    juego.espai[posicioX + i][posicioY + j] = 'O';
                                     break;
                                 case 'cian':
-                                    juego.espai[posicioY + i][posicioX + j] = 'I';
+                                    juego.espai[posicioX + i][posicioY + j] = 'I';
                                     break;
                                 case 'verd':
-                                    juego.espai[posicioY + i][posicioX + j] = 'S';
+                                    juego.espai[posicioX + i][posicioY + j] = 'S';
                                     break;
                                 case 'roig':
-                                    juego.espai[posicioY + i][posicioX + j] = 'Z';
+                                    juego.espai[posicioX + i][posicioY + j] = 'Z';
                                     break;
                                 case 'blau':
-                                    juego.espai[posicioY + i][posicioX + j] = 'L';
+                                    juego.espai[posicioX + i][posicioY + j] = 'L';
                                     break;
                                 case 'taronja':
-                                    juego.espai[posicioY + i][posicioX + j] = 'J';
+                                    juego.espai[posicioX + i][posicioY + j] = 'J';
                                     break;
                                 case 'morat':
-                                    juego.espai[posicioY + i][posicioX + j] = 'T';
+                                    juego.espai[posicioX + i][posicioY + j] = 'T';
                                     break;
                             }
                         }
@@ -164,57 +184,93 @@ and open the template in the editor.
                 var canvas = document.getElementById("mapa");
                 var ctx = canvas.getContext("2d");
                 var img;
+                var imagenPieza;
                 for (var fila = 0; fila < juego.espai.length; fila++) {
                     for (var columna = 0; columna < juego.espai[fila].length; columna++) {
-                       img=llegeixEspai(fila,columna); //leemos cada casilla del tablero
+                        img = llegeixEspai(fila, columna); //leemos cada casilla del tablero
                         ctx.drawImage(img, columna * 20, fila * 20, 20, 20);
                     }
                 }
                 img = document.getElementById("naranja");
+                imagenPieza = seleccionaColor(); //retorna de cada pieza su color.
                 for (var i = 0; i < juego.piezaActual.forma.length; i++) {
-                        for (var j = 0; j < juego.piezaActual.forma[i].length; j++) {
-                            if (juego.piezaActual.forma[i][j] == 1) {
-                                //console.log(juego.piezaActual.posicioX+"-"+juego.piezaActual.posicioY);
-                                console.log((juego.piezaActual.posicioX+i)+"-"+(juego.piezaActual.posicioY+j));
-                                ctx.drawImage(img, (juego.piezaActual.posicioY+j)*20, (juego.piezaActual.posicioX+i)*20, 20, 20);
-                            }
+                    for (var j = 0; j < juego.piezaActual.forma[i].length; j++) {
+                        if (juego.piezaActual.forma[i][j] == 1) {
+                            //console.log(juego.piezaActual.posicioX+"-"+juego.piezaActual.posicioY);
+                            console.log((juego.piezaActual.posicioX + j) + "-" + (juego.piezaActual.posicioY + i));
+                            ctx.drawImage(imagenPieza, (juego.piezaActual.posicioX + j) * 20, (juego.piezaActual.posicioY + i) * 20, 20, 20);
                         }
                     }
+                }
             }
-            ;
-            
-            function llegeixEspai(fila,columna){
+
+
+            function seleccionaColor() {
+                var imagenPieza;
+
+                switch (juego.piezaActual.color) {
+                    case 'groc':
+                        imagenPieza = document.getElementById('amarillo');
+                        break;
+                    case 'cian':
+                        imagenPieza = document.getElementById('cian');
+                        break;
+                    case 'verd':
+                        imagenPieza = document.getElementById('verde');
+                        break;
+                    case 'roig':
+                        imagenPieza = document.getElementById('rojo');
+                        break;
+                    case 'blau':
+                        imagenPieza = document.getElementById('azul');
+                        break;
+                    case 'taronja':
+                        imagenPieza = document.getElementById('naranja');
+                        break;
+                    case 'morat':
+                        imagenPieza = document.getElementById('lila');
+                        break;
+
+                    default:
+
+                        break;
+                }
+
+                return imagenPieza;
+            }
+
+            function llegeixEspai(fila, columna) {
                 var img;
                 switch (juego.espai[fila][columna]) {
-                            case 0:
-                                img = document.getElementById("gris");
-                                break;
-                            case "I":
-                                img = document.getElementById("cian");
-                                break;
-                            case "O":
-                                img = document.getElementById("amarillo");
-                                break;
-                            case "T":
-                                img = document.getElementById("lila");
-                                break;
-                            case "L":
-                                img = document.getElementById("azul");
-                                break;
-                            case "J":
-                                img = document.getElementById("naranja");
-                                break;
-                            case "S":
-                                img = document.getElementById("verde");
-                                break;
-                            case "Z":
-                                img = document.getElementById("rojo");
-                                break;
-                            default :
-                                break;
-                        }
-                        
-                        return img;
+                    case 0:
+                        img = document.getElementById("gris");
+                        break;
+                    case "I":
+                        img = document.getElementById("cian");
+                        break;
+                    case "O":
+                        img = document.getElementById("amarillo");
+                        break;
+                    case "T":
+                        img = document.getElementById("lila");
+                        break;
+                    case "L":
+                        img = document.getElementById("azul");
+                        break;
+                    case "J":
+                        img = document.getElementById("naranja");
+                        break;
+                    case "S":
+                        img = document.getElementById("verde");
+                        break;
+                    case "Z":
+                        img = document.getElementById("rojo");
+                        break;
+                    default :
+                        break;
+                }
+
+                return img;
             }
 
             function GeneraPecaAleatoria()
@@ -234,7 +290,7 @@ and open the template in the editor.
             window.onload = function () {
 
                 juego.inicialitzaJoc();
-                
+
                 //setInterval(pintarJuego, juego.nivell);
 
             };
