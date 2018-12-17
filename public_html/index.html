@@ -22,8 +22,10 @@ and open the template in the editor.
         <img src="rojo.jpg"        id="rojo"    style="display: none;">
         <img src="verde.jpg"       id="verde"    style="display: none;">
         <img src="cuadradoGris.png"       id="gris"    style="display: none;">
+        <img src="cuadradoNegro.jpg"       id="negro"    style="display: none;">
 
         <canvas id="mapa" width="200" height="500" style="border: solid black 1px"> </canvas>
+        <canvas id="mapaPiezaSig" width="80" height="80" style="border: solid black 1px"> </canvas>
 
         <script> //21 3
             var movimientoAutomatico;
@@ -46,9 +48,9 @@ and open the template in the editor.
                 },
                 generaMapa: function () {
                     for (var fila = 0; fila < 25; fila++) {
-                        this.espai[fila]=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                        this.espai[fila] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
                     }
-                    
+
                 },
                 inicialitzaJoc: function () {
                     this.generaMapa();
@@ -56,6 +58,7 @@ and open the template in the editor.
                     this.piezaActual = this.piezaSig();
                     this.piezaSiguiente = this.piezaSig();
                     pintarJuego();
+                    mostrarPiezaSig();
                     movimientoAutomatico = setInterval(this.moure, this.intervalo);
 
                 },
@@ -74,12 +77,12 @@ and open the template in the editor.
                             if (juego.piezaActual.forma[i][j] == 1) {
                                 //console.log(juego.piezaActual.posicioX+"-"+juego.piezaActual.posicioY);
                                 //console.log((juego.piezaActual.posicioX + j) + "-" + (juego.piezaActual.posicioY + i));
-                                if (juego.piezaActual.posicioY + i >= juego.espai.length-1) { //preguntar por poner juego en vez de this
-                                    clearInterval(movimientoAutomatico);
+                                if (((juego.piezaActual.posicioY + i) >= (juego.espai.length - 1)) || (juego.espai[juego.piezaActual.posicioY + (i + 1)][juego.piezaActual.posicioX + j] == "P")) { //preguntar por poner juego en vez de this
                                     pintarJuego();
-                                    encajarPieza();
+                                    fijarPieza();
                                     juego.piezaActual = juego.piezaSiguiente;
                                     juego.piezaSiguiente = juego.piezaSig();
+                                    mostrarPiezaSig();
 
                                 }
                             }
@@ -143,51 +146,13 @@ and open the template in the editor.
                     return false;
                 }
             };
-            Pieza.prototype.asignarLetras = function () {
-                var forma = this.forma[0];
-                var posicioX = this.posicioY;
-                var posicioY = this.posicioY;
+            
 
-                for (var i = 0; i < this.forma.length; i++) {
-                    for (var j = 0; j < this.forma[i].length; j++) {
-                        if (this.forma[i][j] === 1) {
-                            switch (this.color) {
-                                case 'groc':
-                                    juego.espai[posicioX + i][posicioY + j] = 'O';
-                                    break;
-                                case 'cian':
-                                    juego.espai[posicioX + i][posicioY + j] = 'I';
-                                    break;
-                                case 'verd':
-                                    juego.espai[posicioX + i][posicioY + j] = 'S';
-                                    break;
-                                case 'roig':
-                                    juego.espai[posicioX + i][posicioY + j] = 'Z';
-                                    break;
-                                case 'blau':
-                                    juego.espai[posicioX + i][posicioY + j] = 'L';
-                                    break;
-                                case 'taronja':
-                                    juego.espai[posicioX + i][posicioY + j] = 'J';
-                                    break;
-                                case 'morat':
-                                    juego.espai[posicioX + i][posicioY + j] = 'T';
-                                    break;
-                            }
-                        }
-                    }
-                }
-            };
-
-           function encajarPieza(){
-              for (var i = 0; i < juego.piezaActual.forma.length; i++) {
+            function fijarPieza() {
+                for (var i = 0; i < juego.piezaActual.forma.length; i++) {
                     for (var j = 0; j < juego.piezaActual.forma[i].length; j++) {
                         if (juego.piezaActual.forma[i][j] == 1) {
-                            //console.log(juego.piezaActual.posicioX+"-"+juego.piezaActual.posicioY);
-                            //console.log((juego.piezaActual.posicioX + j) + "-" + (juego.piezaActual.posicioY + i));
-                            //juego.espai[3][23]='A';
-                            juego.espai[juego.piezaActual.posicioY + i][juego.piezaActual.posicioX+j]='A';
-                    
+                            juego.espai[juego.piezaActual.posicioY + i][juego.piezaActual.posicioX + j] = 'P';
                         }
                     }
                 }
@@ -207,8 +172,7 @@ and open the template in the editor.
                         ctx.drawImage(img, columna * 20, fila * 20, 20, 20);
                     }
                 }
-                img = document.getElementById("naranja");
-                imagenPieza = seleccionaColor(); //retorna de cada pieza su color.
+                imagenPieza = seleccionaColor(juego.piezaActual.color); //retorna de cada pieza su color.
                 for (var i = 0; i < juego.piezaActual.forma.length; i++) {
                     for (var j = 0; j < juego.piezaActual.forma[i].length; j++) {
                         if (juego.piezaActual.forma[i][j] == 1) {
@@ -220,11 +184,27 @@ and open the template in the editor.
                 }
             }
 
+            function mostrarPiezaSig() {
+                var canvas = document.getElementById("mapaPiezaSig");
+                var ctx = canvas.getContext("2d");
+                var img;
+                for (var i = 0; i < juego.piezaSiguiente.forma.length; i++) {
+                    for (var j = 0; j < juego.piezaSiguiente.forma[i].length; j++) {
+                        if (juego.piezaSiguiente.forma[i][j] == 1) {
+                            img=seleccionaColor(juego.piezaSiguiente.color);
+                            ctx.drawImage(img, (j) * 20, ( i) * 20, 20, 20);
+                        }
+                        else{
+                            img=document.getElementById("gris");
+                            ctx.drawImage(img, (j) * 20, (i) * 20, 20, 20);
+                        }
+                    }
+                }
+            }
 
-            function seleccionaColor() {
+            function seleccionaColor(atrbColor) {
                 var imagenPieza;
-
-                switch (juego.piezaActual.color) {
+                switch (atrbColor) {
                     case 'groc':
                         imagenPieza = document.getElementById('amarillo');
                         break;
@@ -254,7 +234,7 @@ and open the template in the editor.
 
                 return imagenPieza;
             }
-
+            
             function llegeixEspai(fila, columna) {
                 var img;
                 switch (juego.espai[fila][columna]) {
@@ -281,6 +261,9 @@ and open the template in the editor.
                         break;
                     case "Z":
                         img = document.getElementById("rojo");
+                        break;
+                    case "P":
+                        img = document.getElementById("negro");
                         break;
                     default :
                         break;
