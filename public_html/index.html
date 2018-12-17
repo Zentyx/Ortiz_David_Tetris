@@ -46,7 +46,7 @@ and open the template in the editor.
                 },
                 generaMapa: function () {
                     for (var fila = 0; fila < 25; fila++) {
-                        this.espai.push([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+                        this.espai[fila]=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
                     }
                     
                 },
@@ -74,7 +74,7 @@ and open the template in the editor.
                             if (juego.piezaActual.forma[i][j] == 1) {
                                 //console.log(juego.piezaActual.posicioX+"-"+juego.piezaActual.posicioY);
                                 //console.log((juego.piezaActual.posicioX + j) + "-" + (juego.piezaActual.posicioY + i));
-                                if (juego.piezaActual.posicioY + i >= juego.espai.length) { //preguntar por poner juego en vez de this
+                                if (juego.piezaActual.posicioY + i >= juego.espai.length-1) { //preguntar por poner juego en vez de this
                                     clearInterval(movimientoAutomatico);
                                     pintarJuego();
                                     encajarPieza();
@@ -186,7 +186,7 @@ and open the template in the editor.
                             //console.log(juego.piezaActual.posicioX+"-"+juego.piezaActual.posicioY);
                             //console.log((juego.piezaActual.posicioX + j) + "-" + (juego.piezaActual.posicioY + i));
                             //juego.espai[3][23]='A';
-                            //juego.espai[juego.piezaActual.posicioY][juego.piezaActual.posicioX]='A';
+                            juego.espai[juego.piezaActual.posicioY + i][juego.piezaActual.posicioX+j]='A';
                     
                         }
                     }
