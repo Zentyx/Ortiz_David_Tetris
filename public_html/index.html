@@ -34,7 +34,7 @@ and open the template in the editor.
                 piezaActual: {},
                 nivell: 1,
                 piezaSiguiente: {},
-                intervalo: 500,
+                intervalo: 200,
                 cont: {
                     "I": 0,
                     "T": 0,
@@ -48,6 +48,7 @@ and open the template in the editor.
                     for (var fila = 0; fila < 25; fila++) {
                         this.espai.push([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
                     }
+                    
                 },
                 inicialitzaJoc: function () {
                     this.generaMapa();
@@ -67,23 +68,24 @@ and open the template in the editor.
 
                 },
                 moure: function () {
-                    
+                    juego.piezaActual.posicioY++;
                     for (var i = 0; i < juego.piezaActual.forma.length; i++) {
                         for (var j = 0; j < juego.piezaActual.forma[i].length; j++) {
                             if (juego.piezaActual.forma[i][j] == 1) {
                                 //console.log(juego.piezaActual.posicioX+"-"+juego.piezaActual.posicioY);
-                                console.log((juego.piezaActual.posicioX + j) + "-" + (juego.piezaActual.posicioY + i));
-                                if (juego.piezaActual.posicioY + i >= 23) { //preguntar por poner juego en vez de this
+                                //console.log((juego.piezaActual.posicioX + j) + "-" + (juego.piezaActual.posicioY + i));
+                                if (juego.piezaActual.posicioY + i >= juego.espai.length) { //preguntar por poner juego en vez de this
                                     clearInterval(movimientoAutomatico);
-//                                    juego.piezaActual=juego.piezaSiguiente;
-//                                    juego.piezaSiguiente=juego.piezaSig();
-//                                    pintarJuego();
+                                    pintarJuego();
+                                    encajarPieza();
+                                    juego.piezaActual = juego.piezaSiguiente;
+                                    juego.piezaSiguiente = juego.piezaSig();
+
                                 }
                             }
                         }
                     }
-                    juego.piezaActual.posicioY++;
-                                    pintarJuego();
+                    pintarJuego();
 
 
                 },
@@ -177,6 +179,20 @@ and open the template in the editor.
                 }
             };
 
+           function encajarPieza(){
+              for (var i = 0; i < juego.piezaActual.forma.length; i++) {
+                    for (var j = 0; j < juego.piezaActual.forma[i].length; j++) {
+                        if (juego.piezaActual.forma[i][j] == 1) {
+                            //console.log(juego.piezaActual.posicioX+"-"+juego.piezaActual.posicioY);
+                            //console.log((juego.piezaActual.posicioX + j) + "-" + (juego.piezaActual.posicioY + i));
+                            //juego.espai[3][23]='A';
+                            //juego.espai[juego.piezaActual.posicioY][juego.piezaActual.posicioX]='A';
+                    
+                        }
+                    }
+                }
+                console.log(juego.espai);
+            }
 
 
 
@@ -197,7 +213,7 @@ and open the template in the editor.
                     for (var j = 0; j < juego.piezaActual.forma[i].length; j++) {
                         if (juego.piezaActual.forma[i][j] == 1) {
                             //console.log(juego.piezaActual.posicioX+"-"+juego.piezaActual.posicioY);
-                            console.log((juego.piezaActual.posicioX + j) + "-" + (juego.piezaActual.posicioY + i));
+                            //console.log((juego.piezaActual.posicioX + j) + "-" + (juego.piezaActual.posicioY + i));
                             ctx.drawImage(imagenPieza, (juego.piezaActual.posicioX + j) * 20, (juego.piezaActual.posicioY + i) * 20, 20, 20);
                         }
                     }
