@@ -10,7 +10,7 @@ and open the template in the editor.
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
-    <body>
+    <body id="all">
         <p id="puntuacio"></p>
         <p id="puntuacioMaxima"></p>
         <p id="nivell"></p>
@@ -131,16 +131,17 @@ and open the template in the editor.
                 }
             };
             Pieza.prototype.esquerra = function () {
-                if ((this.posicioY + 1) < 14) {
-                    this.posicioY++;
+                if ((this.posicioX + 1) >0) {
+                    console.log(this.posicioX + 1);
+                    this.posicioX--;
                     return true;
                 } else {
                     return false;
                 }
             };
             Pieza.prototype.dreta = function () {
-                if ((this.posicioY - 1) > 0) {
-                    this.posicioY--;
+                if ((this.posicioX - 1) < 14) {
+                    this.posicioX++;
                     return true;
                 } else {
                     return false;
@@ -156,7 +157,7 @@ and open the template in the editor.
                         }
                     }
                 }
-                console.log(juego.espai);
+                //console.log(juego.espai);
             }
 
 
@@ -296,3 +297,27 @@ and open the template in the editor.
         </script>
     </body>
 </html>
+<script>
+
+    function notificaObservador(e) {
+        console.log("Event " + e.type)
+        console.log(e);      //a la consola podeu veure l'objecte que té dos atributs on s'hi indica la tecla pitjada.                                       
+        if (e.code == "ArrowUp") {
+        }
+        if (e.code == "ArrowRight") {
+            juego.piezaActual.dreta();
+            pintarJuego();
+        }
+        if (e.code == "ArrowLeft") {
+            juego.piezaActual.esquerra();
+            pintarJuego();
+        }
+        if (e.code == "ArrowDown") {
+            
+        }
+        
+
+    }
+    var element = document.getElementById("all");
+    element.addEventListener("keydown", notificaObservador);
+</script>
