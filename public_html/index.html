@@ -23,8 +23,9 @@ and open the template in the editor.
         <img src="verde.jpg"       id="verde"    style="display: none;">
         <img src="cuadradoGris.png"       id="gris"    style="display: none;">
         <img src="cuadradoNegro.jpg"       id="negro"    style="display: none;">
+        <img src="ladrillo.jpg"       id="ladrillo"    style="display: none;">
 
-        <canvas id="mapa" width="200" height="500" style="border: solid black 1px"> </canvas>
+        <canvas id="mapa" width="240" height="500" style="border: solid black 1px"> </canvas>
         <canvas id="mapaPiezaSig" width="80" height="80" style="border: solid black 1px"> </canvas>
 
         <script> //21 3
@@ -48,7 +49,7 @@ and open the template in the editor.
                 },
                 generaMapa: function () {
                     for (var fila = 0; fila < 25; fila++) {
-                        this.espai[fila] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                        this.espai[fila] = ["c", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "c"];
                     }
 
                 },
@@ -68,7 +69,7 @@ and open the template in the editor.
                     return this.piezaSiguiente;
                 },
                 iteraccioTeclat: function () {
-
+                    notificaObservador();
                 },
                 moure: function () {
                     juego.piezaActual.posicioY++;
@@ -123,31 +124,66 @@ and open the template in the editor.
                 return formaNova;
             };
             Pieza.prototype.baixa = function () {
-                if ((this.posicioX + 1) < 14) {
-                    this.posicioX++;
-                    return true;
-                } else {
-                    return false;
-                }
+                juego.moure();
             };
             Pieza.prototype.esquerra = function () {
-                if ((this.posicioX + 1) >0) {
-                    console.log(this.posicioX + 1);
+                var ok = true;
+                ok = compruebaIzq();
+                if ((this.posicioX - 1) >= 0 && this.color != "verd" && this.color != "morat") {
                     this.posicioX--;
-                    return true;
-                } else {
-                    return false;
+                } else if ((this.posicioX - 1) > 0 && juego.espai[this.posicioY][this.posicioX - 1] != "P") {
+                    this.posicioX--;
+                }
+
+                if (ok == false) {
+                    this.posicioX++
+                }
+
+
+                function compruebaIzq() {
+                    for (var i = 0; i < juego.piezaActual.forma.length; i++) {
+                        for (var j = 0; j < juego.piezaActual.forma[i].length; j++) {
+                            if (juego.piezaActual.forma[i][j] == 1) {
+                                console.log(juego.espai[juego.piezaActual.posicioY + i][juego.piezaActual.posicioX + (j - 1)]);
+                                if ((juego.espai[juego.piezaActual.posicioY + i][juego.piezaActual.posicioX + (j - 1)] == "P")) {
+                                    return false;
+                                }
+                            }
+                        }
+                    }
                 }
             };
             Pieza.prototype.dreta = function () {
-                if ((this.posicioX - 1) < 14) {
+                var ok = true;
+                ok = compruebaDer();
+
+                if ((this.posicioX + 1) <= 8 && this.color != "cian" && this.color != "roig") {
                     this.posicioX++;
-                    return true;
-                } else {
-                    return false;
+                } else if ((this.posicioX + 1) <= 9 && this.color == "cian") {
+                    this.posicioX++;
+                } else if ((this.posicioX + 1) <= 7 && this.color == "roig") {
+                    this.posicioX++;
+                }
+
+                if (ok == false) {
+                    this.posicioX--;
+                }
+                
+                
+                function compruebaDer() {
+                    for (var i = 0; i < juego.piezaActual.forma.length; i++) {
+                        for (var j = 0; j < juego.piezaActual.forma[i].length; j++) {
+                            if (juego.piezaActual.forma[i][j] == 1) {
+                                console.log(juego.espai[juego.piezaActual.posicioY + i][juego.piezaActual.posicioX + (j + 1)]);
+                                if ((juego.espai[juego.piezaActual.posicioY + i][juego.piezaActual.posicioX + (j + 1)] == "P")) {
+                                    return false;
+                                }
+                            }
+                        }
+                    }
                 }
             };
-            
+
 
             function fijarPieza() {
                 for (var i = 0; i < juego.piezaActual.forma.length; i++) {
@@ -157,7 +193,7 @@ and open the template in the editor.
                         }
                     }
                 }
-                //console.log(juego.espai);
+
             }
 
 
@@ -192,11 +228,10 @@ and open the template in the editor.
                 for (var i = 0; i < juego.piezaSiguiente.forma.length; i++) {
                     for (var j = 0; j < juego.piezaSiguiente.forma[i].length; j++) {
                         if (juego.piezaSiguiente.forma[i][j] == 1) {
-                            img=seleccionaColor(juego.piezaSiguiente.color);
-                            ctx.drawImage(img, (j) * 20, ( i) * 20, 20, 20);
-                        }
-                        else{
-                            img=document.getElementById("gris");
+                            img = seleccionaColor(juego.piezaSiguiente.color);
+                            ctx.drawImage(img, (j) * 20, (i) * 20, 20, 20);
+                        } else {
+                            img = document.getElementById("gris");
                             ctx.drawImage(img, (j) * 20, (i) * 20, 20, 20);
                         }
                     }
@@ -235,12 +270,15 @@ and open the template in the editor.
 
                 return imagenPieza;
             }
-            
+
             function llegeixEspai(fila, columna) {
                 var img;
                 switch (juego.espai[fila][columna]) {
                     case 0:
                         img = document.getElementById("gris");
+                        break;
+                    case "c":
+                        img = document.getElementById("ladrillo");
                         break;
                     case "I":
                         img = document.getElementById("cian");
@@ -300,9 +338,9 @@ and open the template in the editor.
 <script>
 
     function notificaObservador(e) {
-        console.log("Event " + e.type)
-        console.log(e);      //a la consola podeu veure l'objecte que té dos atributs on s'hi indica la tecla pitjada.                                       
+
         if (e.code == "ArrowUp") {
+            juego.piezaActual.rotaHorari();
         }
         if (e.code == "ArrowRight") {
             juego.piezaActual.dreta();
@@ -313,9 +351,9 @@ and open the template in the editor.
             pintarJuego();
         }
         if (e.code == "ArrowDown") {
-            
+            juego.piezaActual.baixa();
         }
-        
+
 
     }
     var element = document.getElementById("all");
