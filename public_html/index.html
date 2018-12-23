@@ -37,7 +37,7 @@ and open the template in the editor.
                 piezaActual: {},
                 nivell: 1,
                 piezaSiguiente: {},
-                intervalo: 500,
+                intervalo: 1000,
                 contadorPiezas:0,
                 generaMapa: function () {
                     for (var fila = 0; fila < 25; fila++) {
@@ -84,12 +84,14 @@ and open the template in the editor.
                     }
                     pintarJuego();
 
-                    if (juego.contadorPiezas == 10) {//cada 10 piezas decrementamos el tiempo e el que bajaran las siguientes
+                    if (juego.contadorPiezas == 10) {//cada 10 piezas decrementamos el tiempo en el que bajaran las siguientes
                         juego.intervalo-=100;
+                        clearInterval(movimientoAutomatico); 
+                        movimientoAutomatico = setInterval(juego.moure, juego.intervalo);
                         juego.puntuacio+=10;
                         juego.nivell+=1;
                         juego.mostrarInfo();
-                        juego.contadorPiezas=0;
+                        juego.contadorPiezas=0;//ponemos a 0 el contador para empezar a contar de nuevo.
                     }
                 },
                 mostrarInfo: function () { //mostraremos el estado de la partida arriba del canvas
