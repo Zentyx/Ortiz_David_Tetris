@@ -38,7 +38,7 @@ and open the template in the editor.
                 nivell: 1,
                 piezaSiguiente: {},
                 intervalo: 1000,
-                contadorPiezas:0,
+                contadorPiezas: 0,
                 generaMapa: function () {
                     for (var fila = 0; fila < 25; fila++) {
                         this.espai[fila] = ["c", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "c"];
@@ -70,7 +70,7 @@ and open the template in the editor.
                         for (var j = 0; j < juego.piezaActual.forma[i].length; j++) {
                             if (juego.piezaActual.forma[i][j] == 1) {//por cada casilla de la pieza...
                                 //miraremos que la posición que tiene debajo no sea el final del mapa o una P (pieza fijada).
-                                if (((juego.piezaActual.posicioY + i) >= (juego.espai.length - 1)) || (juego.espai[juego.piezaActual.posicioY + (i + 1)][juego.piezaActual.posicioX + j] == "P")) { 
+                                if (((juego.piezaActual.posicioY + i) >= (juego.espai.length - 1)) || (juego.espai[juego.piezaActual.posicioY + (i + 1)][juego.piezaActual.posicioX + j] == "P")) {
                                     fijarPieza();
                                     juego.puntuacio += 10; //cada vez que fiijamos una pieza la puntuació sumará 10
                                     juego.mostrarInfo();
@@ -85,13 +85,13 @@ and open the template in the editor.
                     pintarJuego();
 
                     if (juego.contadorPiezas == 10) {//cada 10 piezas decrementamos el tiempo en el que bajaran las siguientes
-                        juego.intervalo-=100;
-                        clearInterval(movimientoAutomatico); 
+                        juego.intervalo -= 100;
+                        clearInterval(movimientoAutomatico);
                         movimientoAutomatico = setInterval(juego.moure, juego.intervalo);
-                        juego.puntuacio+=10;
-                        juego.nivell+=1;
+                        juego.puntuacio += 10;
+                        juego.nivell += 1;
                         juego.mostrarInfo();
-                        juego.contadorPiezas=0;//ponemos a 0 el contador para empezar a contar de nuevo.
+                        juego.contadorPiezas = 0;//ponemos a 0 el contador para empezar a contar de nuevo.
                     }
                 },
                 mostrarInfo: function () { //mostraremos el estado de la partida arriba del canvas
@@ -131,9 +131,9 @@ and open the template in the editor.
                 var ok = true;
                 ok = compruebaIzq();//miraremos si a la izquierda de alguna de las casillas de la pieza tiene
                 //  una pieza fijada para rectificar el movimiento en el sentido contrario
-                
-                
-                if ((this.posicioX - 1) >= 0 && this.color != "verd" && this.color != "morat") { 
+
+
+                if ((this.posicioX - 1) >= 0 && this.color != "verd" && this.color != "morat") {
                     this.posicioX--;
                 } else if ((this.posicioX - 1) > 0) {
                     this.posicioX--;
@@ -187,7 +187,7 @@ and open the template in the editor.
                 }
             };
 
-            
+
             function fijarPieza() {//cuando la pieza se tenga que fijar convertiremos esas posiciones en el espai en P
                 for (var i = 0; i < juego.piezaActual.forma.length; i++) {
                     for (var j = 0; j < juego.piezaActual.forma[i].length; j++) {
@@ -196,28 +196,26 @@ and open the template in the editor.
                         }
                     }
                 }
-                juego.contadorPiezas+=1; //al fijar una pieza sumaremos una al contador
+                juego.contadorPiezas += 1; //al fijar una pieza sumaremos una al contador
             }
 
             function compruebafila() {
                 var contadorP = 0;
                 var fila = 0;
                 for (fila = 0; fila < juego.espai.length; fila++) {
+                    contadorP = 0; //por cada fila dejamos el contador a 0
                     for (var columna = 0; columna < juego.espai[fila].length; columna++) {
                         if (juego.espai[fila][columna] == "P") {
                             contadorP++;
-                            if (contadorP >= 10) {
-                            juego.espai[fila] = juego.espai.slice(0);
-                            juego.espai.splice(fila, 1);
-                            juego.espai.unshift(["c", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "c"]);
+                            if (contadorP >= 10) { //cuando la fila este completada
+                                juego.espai.splice(fila, 1); //eliminamos la fila completada
+                                juego.espai.unshift(["c", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "c"]); //añadimos una fila al final del array.
 
+                            }
                         }
-                        }else{
-                            contadorP = 0;
-                        }
-                        
+
                     }
-                    
+
                 }
 
             }
@@ -376,7 +374,7 @@ and open the template in the editor.
         }
         if (e.code == "ArrowDown") {
             juego.piezaActual.baixa();
-            juego.puntuacio+=1; //cada vez que se pulse la flecha de de bajar, se aumentará en 1 la puntuación.
+            juego.puntuacio += 1; //cada vez que se pulse la flecha de de bajar, se aumentará en 1 la puntuación.
             juego.mostrarInfo();
         }
         if (e.code == "Space") {
