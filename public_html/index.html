@@ -37,16 +37,8 @@ and open the template in the editor.
                 piezaActual: {},
                 nivell: 1,
                 piezaSiguiente: {},
-                intervalo: 200,
-                cont: {
-                    "I": 0,
-                    "T": 0,
-                    "L": 0,
-                    "J": 0,
-                    "O": 0,
-                    "S": 0,
-                    "Z": 0
-                },
+                intervalo: 500,
+                contadorPiezas:0,
                 generaMapa: function () {
                     for (var fila = 0; fila < 25; fila++) {
                         this.espai[fila] = ["c", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "c"];
@@ -56,33 +48,34 @@ and open the template in the editor.
                 inicialitzaJoc: function () {
                     this.generaMapa();
                     this.mostrarInfo();
-                    this.piezaActual = this.piezaSig();
+                    this.piezaActual = this.piezaSig();// al empezar generamos la pieza actual y la siguiente con el mismo método
                     this.piezaSiguiente = this.piezaSig();
-                    pintarJuego();
-                    mostrarPiezaSig();
-                    movimientoAutomatico = setInterval(this.moure, this.intervalo);
+                    pintarJuego(); //pintaremos todos los elementos que esten en el mapa en cada momento
+                    mostrarPiezaSig(); //pintaremos a la derecha la pieza que va a salir después.
+                    movimientoAutomatico = setInterval(this.moure, juego.intervalo);//cada tiempo especificado por el intervalo la pieza se moverá abajo una casilla si puede
 
                 },
                 piezaSig: function () {
-                    var pAleatoria = GeneraPecaAleatoria();
-                    this.piezaSiguiente = new Pieza(pAleatoria[0], pAleatoria[1], 0, 2);
+                    var pAleatoria = GeneraPecaAleatoria(); //guardamos la forma y el color de la pieza
+                    this.piezaSiguiente = new Pieza(pAleatoria[0], pAleatoria[1], 0, 2); //creamos el objeto añadiendo las posiciones de su origen en el mapa.
                     return this.piezaSiguiente;
                 },
                 iteraccioTeclat: function () {
-                    notificaObservador();
+                    notificaObservador(); //lo he separado en otro script por comodidad.
                 },
                 moure: function () {
-                    juego.piezaActual.posicioY++;
+                    compruebafila(); //miraremos si se ha completado una linia para borrarla y bajar las siguientes.
+                    juego.piezaActual.posicioY++; //moveremos la pieza una posicion hacia abajo
                     for (var i = 0; i < juego.piezaActual.forma.length; i++) {
                         for (var j = 0; j < juego.piezaActual.forma[i].length; j++) {
-                            if (juego.piezaActual.forma[i][j] == 1) {
-                                //console.log(juego.piezaActual.posicioX+"-"+juego.piezaActual.posicioY);
-                                //console.log((juego.piezaActual.posicioX + j) + "-" + (juego.piezaActual.posicioY + i));
-                                if (((juego.piezaActual.posicioY + i) >= (juego.espai.length - 1)) || (juego.espai[juego.piezaActual.posicioY + (i + 1)][juego.piezaActual.posicioX + j] == "P")) { //preguntar por poner juego en vez de this
-                                    pintarJuego();
+                            if (juego.piezaActual.forma[i][j] == 1) {//por cada casilla de la pieza...
+                                //miraremos que la posición que tiene debajo no sea el final del mapa o una P (pieza fijada).
+                                if (((juego.piezaActual.posicioY + i) >= (juego.espai.length - 1)) || (juego.espai[juego.piezaActual.posicioY + (i + 1)][juego.piezaActual.posicioX + j] == "P")) { 
                                     fijarPieza();
-                                    juego.piezaActual = juego.piezaSiguiente;
-                                    juego.piezaSiguiente = juego.piezaSig();
+                                    juego.puntuacio += 10; //cada vez que fiijamos una pieza la puntuació sumará 10
+                                    juego.mostrarInfo();
+                                    juego.piezaActual = juego.piezaSiguiente; //actualizamos la pieza actual por la que viene después
+                                    juego.piezaSiguiente = juego.piezaSig(); //generamos otra pieza siguiente.
                                     mostrarPiezaSig();
 
                                 }
@@ -91,12 +84,18 @@ and open the template in the editor.
                     }
                     pintarJuego();
 
-
+                    if (juego.contadorPiezas == 10) {//cada 10 piezas decrementamos el tiempo e el que bajaran las siguientes
+                        juego.intervalo-=100;
+                        juego.puntuacio+=10;
+                        juego.nivell+=1;
+                        juego.mostrarInfo();
+                        juego.contadorPiezas=0;
+                    }
                 },
-                mostrarInfo: function () {
-                    document.getElementById("puntuacio").innerHTML = "Puntuacio " + this.puntuacio;
-                    document.getElementById("puntuacioMaxima").innerHTML = "Nivell: " + this.maxPuntuacio;
-                    document.getElementById("nivell").innerHTML = "Nivell: " + this.nivell;
+                mostrarInfo: function () { //mostraremos el estado de la partida arriba del canvas
+                    document.getElementById("puntuacio").innerHTML = "Puntuacio " + juego.puntuacio;
+                    document.getElementById("puntuacioMaxima").innerHTML = "Puntuació màxima " + juego.maxPuntuacio;
+                    document.getElementById("nivell").innerHTML = "Nivell: " + juego.nivell;
                 }
             };
 
@@ -116,22 +115,25 @@ and open the template in the editor.
                 }
                 this.forma = formaNova;
             };
-            Pieza.prototype.rotaAntiHorari = function () {
+            Pieza.prototype.rotaAntiHorari = function () {//llamamos al rotar horari 3 veces.
                 var formaNova;
                 for (var i = 0; i < 3; i++) {
                     formaNova = this.rotaHorari();
                 }
                 return formaNova;
             };
-            Pieza.prototype.baixa = function () {
+            Pieza.prototype.baixa = function () { //reutilizamos la parte del codigo del movimiento automatico para forzar otro movimiento.
                 juego.moure();
             };
             Pieza.prototype.esquerra = function () {
                 var ok = true;
-                ok = compruebaIzq();
-                if ((this.posicioX - 1) >= 0 && this.color != "verd" && this.color != "morat") {
+                ok = compruebaIzq();//miraremos si a la izquierda de alguna de las casillas de la pieza tiene
+                //  una pieza fijada para rectificar el movimiento en el sentido contrario
+                
+                
+                if ((this.posicioX - 1) >= 0 && this.color != "verd" && this.color != "morat") { 
                     this.posicioX--;
-                } else if ((this.posicioX - 1) > 0 && juego.espai[this.posicioY][this.posicioX - 1] != "P") {
+                } else if ((this.posicioX - 1) > 0) {
                     this.posicioX--;
                 }
 
@@ -144,7 +146,6 @@ and open the template in the editor.
                     for (var i = 0; i < juego.piezaActual.forma.length; i++) {
                         for (var j = 0; j < juego.piezaActual.forma[i].length; j++) {
                             if (juego.piezaActual.forma[i][j] == 1) {
-                                console.log(juego.espai[juego.piezaActual.posicioY + i][juego.piezaActual.posicioX + (j - 1)]);
                                 if ((juego.espai[juego.piezaActual.posicioY + i][juego.piezaActual.posicioX + (j - 1)] == "P")) {
                                     return false;
                                 }
@@ -154,6 +155,7 @@ and open the template in the editor.
                 }
             };
             Pieza.prototype.dreta = function () {
+                //haremos lo mismo que en el otro método pero mirando a la derecha.
                 var ok = true;
                 ok = compruebaDer();
 
@@ -168,13 +170,12 @@ and open the template in the editor.
                 if (ok == false) {
                     this.posicioX--;
                 }
-                
-                
+
+
                 function compruebaDer() {
                     for (var i = 0; i < juego.piezaActual.forma.length; i++) {
                         for (var j = 0; j < juego.piezaActual.forma[i].length; j++) {
                             if (juego.piezaActual.forma[i][j] == 1) {
-                                console.log(juego.espai[juego.piezaActual.posicioY + i][juego.piezaActual.posicioX + (j + 1)]);
                                 if ((juego.espai[juego.piezaActual.posicioY + i][juego.piezaActual.posicioX + (j + 1)] == "P")) {
                                     return false;
                                 }
@@ -184,14 +185,37 @@ and open the template in the editor.
                 }
             };
 
-
-            function fijarPieza() {
+            
+            function fijarPieza() {//cuando la pieza se tenga que fijar convertiremos esas posiciones en el espai en P
                 for (var i = 0; i < juego.piezaActual.forma.length; i++) {
                     for (var j = 0; j < juego.piezaActual.forma[i].length; j++) {
                         if (juego.piezaActual.forma[i][j] == 1) {
                             juego.espai[juego.piezaActual.posicioY + i][juego.piezaActual.posicioX + j] = 'P';
                         }
                     }
+                }
+                juego.contadorPiezas+=1; //al fijar una pieza sumaremos una al contador
+            }
+
+            function compruebafila() {
+                var contadorP = 0;
+                var fila = 0;
+                for (fila = 0; fila < juego.espai.length; fila++) {
+                    for (var columna = 0; columna < juego.espai[fila].length; columna++) {
+                        if (juego.espai[fila][columna] == "P") {
+                            contadorP++;
+                            if (contadorP >= 10) {
+                            juego.espai[fila] = juego.espai.slice(0);
+                            juego.espai.splice(fila, 1);
+                            juego.espai.unshift(["c", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "c"]);
+
+                        }
+                        }else{
+                            contadorP = 0;
+                        }
+                        
+                    }
+                    
                 }
 
             }
@@ -206,22 +230,21 @@ and open the template in the editor.
                 for (var fila = 0; fila < juego.espai.length; fila++) {
                     for (var columna = 0; columna < juego.espai[fila].length; columna++) {
                         img = llegeixEspai(fila, columna); //leemos cada casilla del tablero
-                        ctx.drawImage(img, columna * 20, fila * 20, 20, 20);
+                        ctx.drawImage(img, columna * 20, fila * 20, 20, 20); //pintamos la casilla de gris
                     }
                 }
                 imagenPieza = seleccionaColor(juego.piezaActual.color); //retorna de cada pieza su color.
-                for (var i = 0; i < juego.piezaActual.forma.length; i++) {
+                for (var i = 0; i < juego.piezaActual.forma.length; i++) { //recorremos toda la matriz de la pieza
                     for (var j = 0; j < juego.piezaActual.forma[i].length; j++) {
-                        if (juego.piezaActual.forma[i][j] == 1) {
-                            //console.log(juego.piezaActual.posicioX+"-"+juego.piezaActual.posicioY);
-                            //console.log((juego.piezaActual.posicioX + j) + "-" + (juego.piezaActual.posicioY + i));
+                        if (juego.piezaActual.forma[i][j] == 1) {  //la secuencia de 1 hace la forma de la pieza
+                            //segun la posicion de cada casilla de la pieza (los 1) la pintaremos en el canvas con su color correspondiente
                             ctx.drawImage(imagenPieza, (juego.piezaActual.posicioX + j) * 20, (juego.piezaActual.posicioY + i) * 20, 20, 20);
                         }
                     }
                 }
             }
 
-            function mostrarPiezaSig() {
+            function mostrarPiezaSig() { //haremos otro canvas dibujando la pieza siguiente
                 var canvas = document.getElementById("mapaPiezaSig");
                 var ctx = canvas.getContext("2d");
                 var img;
@@ -238,7 +261,7 @@ and open the template in the editor.
                 }
             }
 
-            function seleccionaColor(atrbColor) {
+            function seleccionaColor(atrbColor) { //segun el atributo color de la pieza, retornaremos el que le pertoca
                 var imagenPieza;
                 switch (atrbColor) {
                     case 'groc':
@@ -325,7 +348,7 @@ and open the template in the editor.
                 return peces[numeroAleatori];
             }
 
-            window.onload = function () {
+            window.onload = function () { //tendremos que esperar a que las imagenes se hayan cargado antes de empezar a ejecutar el juego.
 
                 juego.inicialitzaJoc();
 
@@ -338,7 +361,6 @@ and open the template in the editor.
 <script>
 
     function notificaObservador(e) {
-
         if (e.code == "ArrowUp") {
             juego.piezaActual.rotaHorari();
         }
@@ -352,6 +374,11 @@ and open the template in the editor.
         }
         if (e.code == "ArrowDown") {
             juego.piezaActual.baixa();
+            juego.puntuacio+=1; //cada vez que se pulse la flecha de de bajar, se aumentará en 1 la puntuación.
+            juego.mostrarInfo();
+        }
+        if (e.code == "Space") {
+            juego.piezaActual.rotaAntiHorari();
         }
 
 
